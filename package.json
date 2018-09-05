@@ -11,18 +11,21 @@
   "license": "MIT",
   "scripts": {
     "start": "node index.js",
-    "server": "nodemon index.js",
+    "server": "nodemon index.js --no-deprecation",
     "client": "npm run start --prefix client",
-    "dev": "concurrently \"yarn run server\" \"yarn run client\" \"yarn run webhook\"",
+    "dev": "concurrently \"yarn run server\"  \"yarn run webhook\"",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client",
     "webhook": "./sendgrid_webhook.sh",
     "production": "yarn && pm2 start index.js && cd client && yarn && yarn build"
   },
   "dependencies": {
+    "bcrypt": "^3.0.0",
     "body-parser": "^1.18.3",
     "concurrently": "^3.5.1",
     "cookie-session": "^2.0.0-beta.3",
+    "crypto-js": "^3.1.9-1",
     "express": "^4.16.3",
+    "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.10",
     "mongoose": "^5.0.17",
     "nodemon": "^1.17.3",
@@ -30,6 +33,7 @@
     "passport-google-oauth20": "^1.0.0",
     "path-parser": "^4.2.0",
     "sendgrid": "^5.2.3",
-    "stripe": "^6.1.1"
+    "stripe": "^6.1.1",
+    "validator": "^10.7.1"
   }
 }
