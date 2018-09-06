@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const keys = require("./config/keys");
+const cors = require("cors");
 require("./models/User");
 require("./models/Survey");
 
@@ -22,6 +23,7 @@ mongoose
   );
 
 const app = express();
+app.use(cors());
 app.use(bodyParser.json());
 
 /////////////// ROUTES ////////////////
