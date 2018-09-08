@@ -21,7 +21,6 @@ module.exports = app => {
       // We send back that user and redirect them
       .then(token => {
         res.header("x-auth", token).send(user);
-        res.redirect("/surveys");
       })
       .catch(err => {
         res.status(400).send(err);
@@ -40,7 +39,6 @@ module.exports = app => {
       .then(user => {
         return user.generateAuthToken().then(token => {
           res.header("x-auth", token).send(user);
-          res.redirect("/surveys");
         });
       })
       .catch(err => {
