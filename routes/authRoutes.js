@@ -5,7 +5,6 @@ const authenticate = require("../middlewares/authenticate");
 const bcrypt = require("bcryptjs");
 
 module.exports = app => {
-  // Registers a new user
   app.post("/api/register", (req, res) => {
     const user = new User({
       email: req.body.email,
