@@ -6,6 +6,11 @@ const bcrypt = require("bcryptjs");
 
 module.exports = app => {
   app.post("/api/register", (req, res) => {
+    if (req.body.password !== req.body.passwordConf) {
+      res.status(403).send({
+        errorMessage: "Password and Password Confirmation Do Not Match"
+      });
+    }
     const user = new User({
       email: req.body.email,
       password: req.body.password
@@ -41,7 +46,9 @@ module.exports = app => {
         });
       })
       .catch(err => {
-        res.status(400).send("Invalid Login");
+        res.status(403).send({
+          errorMessage: "Invalid Login"
+        });
       });
   });
 
