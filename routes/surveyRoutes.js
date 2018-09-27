@@ -60,8 +60,13 @@ module.exports = app => {
   app.delete("/api/surveys/:surveyid", authenticate, async (req, res) => {
     const surveyId = req.params.surveyid;
 
-    const surveyDeleted = Survey.findByIdAndRemove(surveyId);
-    res.status(200).send({ message: "Survey Successfully Deleted" });
+    const surveyDeleted = Survey.findOneAndDelete(surveyId)
+      .then(value => {
+        res.status(200).send({ message: "Survey Successfully Deleted" });
+      })
+      .catch(err => {
+        res.status(400).send({ errorMessage: err });
+      });
   });
 
   app.get("/api/surveys/:surveyId/:choice", (req, res) => {
