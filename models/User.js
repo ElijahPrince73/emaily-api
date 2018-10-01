@@ -1,10 +1,10 @@
-const mongoose = require("mongoose");
-const validator = require("validator");
-const jwt = require("jsonwebtoken");
-const _ = require("lodash");
-const bcrypt = require("bcryptjs");
+/* eslint-disable */
+const mongoose = require('mongoose');
+const validator = require('validator');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
-var UserSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
@@ -13,76 +13,74 @@ var UserSchema = new mongoose.Schema({
     unique: true,
     validate: {
       validator: validator.isEmail,
-      message: "{VALUE} is not a valid email"
-    }
+      message: '{VALUE} is not a valid email',
+    },
   },
   password: {
     type: String,
     require: true,
-    minlength: 6
+    minlength: 6,
   },
   tokens: [
     {
       access: {
         type: String,
-        required: true
+        required: true,
       },
       token: {
         type: String,
-        required: true
-      }
-    }
+        required: true,
+      },
+    },
   ],
   credits: {
     type: Number,
-    default: 0
-  }
+    default: 5,
+  },
 });
 
 // Instance Method
-UserSchema.methods.generateAuthToken = function() {
-  var user = this;
-  var access = "auth";
-  var token = jwt
+UserSchema.methods.generateAuthToken = function () {
+  const user = this;
+  const access = 'auth';
+  const token = jwt
     .sign(
       {
         _id: user._id.toHexString(),
-        access
+        access,
       },
-      "abc123"
+      'abc123',
     )
     .toString();
 
   user.tokens.push({
     access,
-    token
+    token,
   });
 
-  return user.save().then(() => {
-    return token;
-  });
+  return user.save().then(() => token);
 };
 
-UserSchema.methods.removeToken = function(token) {
+UserSchema.methods.removeToken = function (token) {
   const user = this;
 
   return user.update({
     $pull: {
       tokens: {
-        token
-      }
-    }
+        token,
+      },
+    },
   });
 };
 
 // Model Method to findByToken
-UserSchema.statics.findByToken = function(token) {
+UserSchema.statics.findByToken = function (token) {
   const User = this;
   let decoded;
 
   try {
     // Verify that the token is something we created
-    decoded = jwt.verify(token, "abc123");
+    decoded = jwt.verify(token, 'abc123');
   } catch (e) {
     return new Promise((resolve, reject) => {
       reject();
@@ -91,18 +89,18 @@ UserSchema.statics.findByToken = function(token) {
 
   return User.findOne({
     _id: decoded._id,
-    "tokens.token": token,
-    "tokens.access": "auth"
+    'tokens.token': token,
+    'tokens.access': 'auth',
   });
 };
 
 // Model Method to findByEmail
-UserSchema.statics.findByCredentials = function(email, password) {
+UserSchema.statics.findByCredentials = function (email, password) {
   const User = this;
 
   return User.findOne({
-    email
-  }).then(user => {
+    email,
+  }).then((user) => {
     if (!user) {
       return Promise.reject();
     }
@@ -119,9 +117,9 @@ UserSchema.statics.findByCredentials = function(email, password) {
   });
 };
 
-UserSchema.pre("save", function(next) {
+UserSchema.pre('save', function (next) {
   const user = this;
-  if (user.isModified("password")) {
+  if (user.isModified('password')) {
     bcrypt.genSalt(10, (err, salt) => {
       bcrypt.hash(user.password, salt, (err, hash) => {
         user.password = hash;
@@ -133,4 +131,4 @@ UserSchema.pre("save", function(next) {
   }
 });
 
-mongoose.model("User", UserSchema);
+mongoose.model('User', UserSchema);

@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
+
 const {
-  Schema
-} = mongoose
+  Schema,
+} = mongoose;
 const RecipientSchema = require('./Recipient');
 
 const surveySchema = new Schema({
@@ -14,19 +15,20 @@ const surveySchema = new Schema({
   // Answered
   yes: {
     type: Number,
-    default: 0
+    default: 0,
   },
   no: {
     type: Number,
-    default: 0
+    default: 0,
   },
   // Sets up a relation between the survey and the user who created it
   _user: {
     type: Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
   },
   dateSent: Date,
-  lastResponded: Date
-})
+  lastResponded: Date,
+  isDraft: Boolean,
+});
 
-mongoose.model('surveys', surveySchema)
+mongoose.model('surveys', surveySchema);

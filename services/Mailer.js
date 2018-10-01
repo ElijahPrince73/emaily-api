@@ -1,11 +1,13 @@
+/* eslint-disable */
 const sendgrid = require('sendgrid');
+
 const helper = sendgrid.mail;
 const keys = require('../config/keys');
 
 class Mailer extends helper.Mail {
   constructor({
     subject,
-    recipients
+    recipients,
   }, content) {
     super();
 
@@ -22,10 +24,8 @@ class Mailer extends helper.Mail {
 
   formatAddresses(recipients) {
     return recipients.map(({
-      email
-    }) => {
-      return new helper.Email(email);
-    });
+      email,
+    }) => new helper.Email(email));
   }
 
   addClickTracking() {
@@ -39,7 +39,7 @@ class Mailer extends helper.Mail {
   addRecipients() {
     const personalize = new helper.Personalization();
 
-    this.recipients.forEach(recipient => {
+    this.recipients.forEach((recipient) => {
       personalize.addTo(recipient);
     });
     this.addPersonalization(personalize);
@@ -49,7 +49,7 @@ class Mailer extends helper.Mail {
     const request = this.sgApi.emptyRequest({
       method: 'POST',
       path: '/v3/mail/send',
-      body: this.toJSON()
+      body: this.toJSON(),
     });
 
     const response = await this.sgApi.API(request);
