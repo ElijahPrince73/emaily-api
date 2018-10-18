@@ -35,46 +35,44 @@ module.exports = (app) => {
     const {
       title, subject, body, recipients, id, isDraft,
     } = req.body;
-
-    let survey = {
+    
+    survey = new Survey({
       title,
       subject,
       body,
-      recipients: recipients.split(',').map(email => ({
+      recipients: recipients.map(email => ({
         email: email.trim(),
       })),
       _user: req.user.id,
       dateSent: Date.now(),
-    };
+    });
 
     if (isDraft) {
-      Survey.findByIdAndUpdate(id, {
-        isDraft: false,
-      });
+      Survey.findByIdAndUpdate(id, { $set: { isDraft: false } }, { new: true, upsert: true })
+        .then(() => {
+          const mailer = new Mailer(survey, surveyTemplate(survey));
+          try {
+            mailer.send();
+            req.user.credits -= 1;
+            const user = req.user.save();
+            res.send(user);
+          } catch (err) {
+            res.status(422).send(err);
+          }
+        })
     } else {
-      survey = new Survey({
-        title,
-        subject,
-        body,
-        recipients: recipients.split(',').map(email => ({
-          email: email.trim(),
-        })),
-        _user: req.user.id,
-        dateSent: Date.now(),
-      });
+      const mailer = new Mailer(survey, surveyTemplate(survey));
+      try {
+        await mailer.send();
+        await survey.save();
+        req.user.credits -= 1;
+        const user = await req.user.save();
+        res.send(user);
+      } catch (err) {
+        res.status(422).send(err);
+      }
     }
 
-    // Great place to send an email!
-    const mailer = new Mailer(survey, surveyTemplate(survey));
-    try {
-      await mailer.send();
-      await survey.save();
-      req.user.credits -= 1;
-      const user = await req.user.save();
-      res.send(user);
-    } catch (err) {
-      res.status(422).send(err);
-    }
   });
 
   // Save survey draft
