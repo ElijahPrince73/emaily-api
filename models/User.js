@@ -49,7 +49,7 @@ UserSchema.methods.generateAuthToken = function () {
         _id: user._id.toHexString(),
         access,
       },
-      'abc123',
+      'abc123'
     )
     .toString();
 
